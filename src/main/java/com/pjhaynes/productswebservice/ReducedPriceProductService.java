@@ -1,6 +1,6 @@
 package com.pjhaynes.productswebservice;
 
-import com.pjhaynes.productswebservice.api.JlService;
+import com.pjhaynes.productswebservice.api.JLService;
 import com.pjhaynes.productswebservice.model.Product;
 import com.pjhaynes.productswebservice.response.QueryResponse;
 import com.pjhaynes.productswebservice.utils.NullOnEmtpyConverterFactory;
@@ -10,7 +10,8 @@ import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
-import javax.annotation.PostConstruct;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -26,7 +27,6 @@ public class ReducedPriceProductService {
     private List<Product> allProducts;
     private List<Product> discountedProducts = new ArrayList<>();
 
-
     private OkHttpClient okHttpClient = new OkHttpClient
             .Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -40,29 +40,22 @@ public class ReducedPriceProductService {
             .addConverterFactory(JacksonConverterFactory.create())
             .build();
 
-    private JlService jlSerice = jlRetrofit.create(JlService.class);
-
-    @PostConstruct
-    public void getReducedPriceProducts() {
-        final Call<QueryResponse> call = jlSerice.products(JL_API_URL);
-
-        call.enqueue(new CallbackWithRetry<QueryResponse>(JL_API_REQUEST_NAME, RETRY_ATTEMPTS) {
-            @Override
-            public void onResponse(Call<QueryResponse> call, Response<QueryResponse> response) {
-                QueryResponse result = response.body();
-                allProducts = result.getProducts();
-            }
-            @Override
-            public void onFailure(Call<QueryResponse> call, Throwable t) {
-                System.out.println(" Call Failed: " + t.getMessage());
-            }
-        });
-    }
+    private JLService jlService = jlRetrofit.create(JLService.class);
 
 
+    public Collection<Product> getReducedPriceProducts(String labelType) throws IOException {
 
-    public void filterAndSortProducts() {
-        //First calculate discounts so products can be sorted
+        final Call<QueryResponse> call = jlService.products(JL_API_URL);
+
+        Response<QueryResponse> response = call.execute();
+
+        if (!response.isSuccessful()) {
+            throw new IOException(response.errorBody() != null
+                    ? response.errorBody().string() : "Unknown error");
+        }
+        QueryResponse productsResponse = response.body();
+        allProducts = productsResponse.getProducts();
+
         allProducts.forEach(product -> {
             product.setNowPrice();
             product.setDiscount();
@@ -71,16 +64,11 @@ public class ReducedPriceProductService {
                 .filter(product -> product.getPrice().getNow() < product.getPrice().getWas() && product.getPrice().getNow() != NO_PRICE)
                 .sorted(Comparator.comparing(Product::getDiscount).reversed())
                 .collect(Collectors.toList());
-    }
-
-    public void setProductPriceLabel(String labelType) {
         discountedProducts.forEach(product -> {
             product.setPercentageDiscount();
             product.setPriceLabel(labelType);
-        });
-    }
 
-    public Collection<Product> getDiscountedProducts() {
+        });
         return discountedProducts;
     }
 }

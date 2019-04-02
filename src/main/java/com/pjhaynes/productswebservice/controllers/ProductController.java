@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import static com.pjhaynes.productswebservice.utils.Constants.SHOW_WAS_NOW;
@@ -24,16 +25,13 @@ public class ProductController {
     }
 
     @RequestMapping(value = "/ShowDiscountedProducts", method = RequestMethod.GET)
-    public @ResponseBody Collection<Product> showDiscountedProducts (@RequestParam(value = "labelType", required = false) String labelType) {
-        //Run this check against full list every time to check for updated data
-        reducedPriceProductService.filterAndSortProducts();
-        if (labelType != null) {
-            reducedPriceProductService.setProductPriceLabel(labelType);
-            return reducedPriceProductService.getDiscountedProducts();
-        } else {
-            reducedPriceProductService.setProductPriceLabel(SHOW_WAS_NOW);
-            return reducedPriceProductService.getDiscountedProducts();
+    public @ResponseBody Collection<Product> showDiscountedProducts (@RequestParam(value = "labelType", required = false) String labelType) throws IOException {
 
+        if (labelType != null) {
+            return reducedPriceProductService.getReducedPriceProducts(labelType);
+        } else {
+            return reducedPriceProductService.getReducedPriceProducts(SHOW_WAS_NOW);
         }
     }
 }
+

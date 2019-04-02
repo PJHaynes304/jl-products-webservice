@@ -6,7 +6,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Url;
 
 
-public interface JlService {
+public interface JLService {
 
     @GET
     Call<QueryResponse> products(@Url String apiUrl);

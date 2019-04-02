@@ -7,8 +7,6 @@ public class Constants {
 
     public final static String JL_API_URL = "https://jl-nonprod-syst.apigee.net/v1/categories/600001506/products?key=2ALHCAAs6ikGRBoy6eTHA58RaG097Fma";
     public final static String BASE_URL_TO_OVERRIDE = "http://example.com";
-    public final static int RETRY_ATTEMPTS = 3;
-    public final static String JL_API_REQUEST_NAME = "JohnLewisApiRequest";
     public final static int NO_PRICE = 0;
     public final static int TEN_POUNDS_IN_PENCE = 1000;
     public final static DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.00");
