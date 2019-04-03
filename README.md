@@ -2,6 +2,10 @@
 
 Tech Test
 
+Spring Boot App for getting discounted products and returning custom Json.
+
+Run command: ./gradlew build && java -jar build/libs/products-webservice-0.0.1-SNAPSHOT.jar
+
 Endpoints:
 
 http://localhost:8080/ShowDiscountedProducts
