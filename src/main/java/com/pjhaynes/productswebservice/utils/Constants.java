@@ -13,6 +13,7 @@ public class Constants {
     public final static String SHOW_WAS_NOW = "ShowWasNow";
     public final static String SHOW_WAS_THEN_NOW = "ShowWasThenNow";
     public final static String SHOW_PERC_DISCOUNT = "ShowPercDscount";
+    public final static String TEST_PARAM = "testParamString";
 
     public final static HashMap<String, String> BASIC_COLOR_RGB_TABLE = new HashMap<String, String>() {{
         put("Black", "000000");
